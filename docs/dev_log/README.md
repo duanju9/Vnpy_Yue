@@ -41,3 +41,10 @@ docs/dev_log/YYYY-MM-DD_NNN_<slug>.md
 - **绝不在 dev_log 里贴任何 token / 密钥**。所有密钥都走 `examples/.env`（已在 `.gitignore`）。
 - 涉及回测指标时，附带 commit hash + 数据时间窗，保证可复现。
 - 涉及第三方接口（小龙虾 / QMT / 同花顺）时，记录手册链接 + 当时限速 / 配额状态，避免后人踩坑。
+
+## 近期条目索引
+
+| 日期 | 文件 | 摘要 |
+|------|------|------|
+| 2026-05-05 | [2026-05-05_002_data_cache_architecture.md](2026-05-05_002_data_cache_architecture.md) | 数据缓存层（Parquet + manifest）与后续分析方向 |
+| 2026-05-05 | [2026-05-05_003_github_push_session.md](2026-05-05_003_github_push_session.md) | GitHub `master` 推送、`85ee97f` 范围、README_ENG 恢复说明 |
