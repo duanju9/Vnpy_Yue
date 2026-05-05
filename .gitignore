@@ -41,3 +41,17 @@ _templates
 # Alpha
 lab/
 /.mypy_cache
+
+# API keys (e.g. Tushare / tsy.xiaodefa proxy)
+.env
+.env.local
+
+# Local quick-test artifacts (HTML / JSON 报表)
+examples/quick_tests/output/
+
+# Vnpy_Yue 本地数据缓存（Parquet + manifest.sqlite）
+data/vnpy_yue/
+
+# CTA 回测脚本独立 Sqlite（run_dual_ma_cta_backtest.py）
+examples/quick_tests/cta_bt_workspace/
+

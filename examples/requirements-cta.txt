@@ -1,0 +1,5 @@
+# CTA 回测脚本 examples/quick_tests/run_dual_ma_cta_backtest.py
+# pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r examples/requirements-cta.txt
+vnpy_ctastrategy>=1.3.0
+vnpy_ctabacktester>=1.3.0
+vnpy_sqlite>=1.1.0
