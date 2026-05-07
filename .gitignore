@@ -38,6 +38,10 @@ _templates
 .DS_Store
 *.mo
 
+# Excel 打开工作簿时产生的锁文件（勿提交，且会导致 git add 权限错误）
+~$*.xlsx
+~$*.xls
+
 # Alpha
 lab/
 /.mypy_cache
