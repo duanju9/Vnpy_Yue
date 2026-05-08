@@ -41,6 +41,9 @@ if str(_ROOT) not in sys.path:
 from fractal_levels import fractal_high_low  # noqa: E402
 from symbol_resolve import resolve_contract  # noqa: E402
 
+# 侧边栏显示：用于确认已拉取到含「合约别名」的最新脚本（改代码后请结束旧 Streamlit 再启）
+CHAN_WEB_BUILD = "28965df+ux"
+
 
 def _fig_candle(df: pd.DataFrame, title: str, *, show_fractal: bool, fractal_n: int) -> go.Figure:
     df = df.copy()
@@ -132,6 +135,7 @@ def main() -> None:
     )
 
     with st.sidebar:
+        st.caption(f"chan_web 构建 `{CHAN_WEB_BUILD}` · 更新后若别名无效，请先关掉旧 Streamlit 进程再启动")
         st.header("数据")
         src = st.radio("来源", ("miniQMT (xtdata)", "上传 CSV"), index=0)
         code_raw = st.text_input(
@@ -155,12 +159,13 @@ def main() -> None:
     if src.startswith("miniQMT"):
         try:
             code, cname = resolve_contract(code_raw)
-            if cname:
-                st.sidebar.success(f"已识别：**{code}**（{cname}）")
-            else:
-                st.sidebar.success(f"已识别：**{code}**")
+            label = f"{code}（{cname}）" if cname else code
+            st.sidebar.success(f"已识别：{label}")
         except ValueError as e:
             err = str(e)
+            code = ""
+        except Exception as e:
+            err = f"合约解析异常: {e}"
             code = ""
         if not err:
             try:
@@ -205,7 +210,13 @@ def main() -> None:
         if err:
             st.error(err)
         elif df is None or df.empty:
-            st.info("请选择 CSV，或使用 miniQMT 并确认客户端已登录、合约代码正确。")
+            if src.startswith("miniQMT") and code and not err:
+                st.warning(
+                    f"合约 **{code}** 已解析，但未取到 K 线（空表）。"
+                    "请确认 miniQMT 已登录、已勾选「增量下载」，或减小时间范围/根数后再试。"
+                )
+            else:
+                st.info("请选择 CSV，或使用 miniQMT 并确认客户端已登录、合约可解析。")
         else:
             title = f"{code} {period} 共 {len(df)} 根"
             fig = _fig_candle(df, title, show_fractal=show_frac, fractal_n=int(frac_n))
