@@ -14,19 +14,37 @@ pip install -r examples/chan_web/requirements-chan-web.txt
 
 ## 本机运行
 
+在仓库根目录 `Vnpy_Yue` 下任选其一：
+
 ```text
 streamlit run examples/chan_web/app.py
 ```
 
-浏览器默认 <http://localhost:8501>。
+或（推荐，避免首次卡在终端问邮箱、端口一直不起）：
+
+```text
+streamlit run examples/chan_web/app.py --server.headless true
+```
+
+或一键：
+
+```text
+powershell -ExecutionPolicy Bypass -File examples/chan_web/run.ps1
+```
+
+仓库根目录已含 `.streamlit/config.toml`（`headless` + 关闭使用统计），与上式二选一即可。
+
+浏览器手动打开 **<http://localhost:8501>**（headless 不会自动弹出浏览器）。
+
+若仍停在「Welcome / email」：在终端 **直接按一次 Enter**（邮箱留空）即可继续。
 
 ## 给同一 WiFi 下的朋友访问
 
 ```text
-streamlit run examples/chan_web/app.py --server.address 0.0.0.0 --server.port 8501
+streamlit run examples/chan_web/app.py --server.headless true --server.address 0.0.0.0 --server.port 8501
 ```
 
-对方浏览器打开：`http://你的电脑局域网IP:8501`（Windows 可在 `ipconfig` 里看 IPv4）。
+对方浏览器打开：`http://你的电脑局域网IP:8501`（Windows 可在 `ipconfig` 里看 IPv4）。本机也需 **手动打开** 浏览器，不会自动弹出。
 
 - 当前示例 **无登录、无 HTTPS**，仅适合信任环境。  
 - 需要外网或鉴权时：自行加 VPN、云主机 + Nginx 基本认证，或查阅 Streamlit 官方 `secrets` / 社区鉴权方案。

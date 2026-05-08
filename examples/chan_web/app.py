@@ -6,13 +6,13 @@ K 线 + 简易分形压力/支撑（Plotly），数据源可选 miniQMT 或 CSV�
 
    cd Vnpy_Yue
    pip install -r examples/chan_web/requirements-chan-web.txt
-   streamlit run examples/chan_web/app.py
+   streamlit run examples/chan_web/app.py --server.headless true
 
 局域网给友人访问::
 
-   streamlit run examples/chan_web/app.py --server.address 0.0.0.0 --server.port 8501
+   streamlit run examples/chan_web/app.py --server.headless true --server.address 0.0.0.0 --server.port 8501
 
-浏览器打开: http://本机IP:8501 （同一 WiFi 下手机也可访问）
+浏览器手动打开 http://localhost:8501 或 http://本机IP:8501 （headless 不自动弹窗；同一 WiFi 下手机也可访问）
 
 说明: 完整缠论（笔/线段/中枢）请自行克隆 Vespa314/chan.py（Python>=3.11），
 本页不内置其依赖；分形层为研究用近似，不等同于 chan.py 买卖点。

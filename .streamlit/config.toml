@@ -1,0 +1,6 @@
+# Vnpy_Yue：在仓库根目录运行 streamlit 时使用（避免首次卡在终端问邮箱、端口迟迟不起）
+[browser]
+gatherUsageStats = false
+
+[server]
+headless = true
