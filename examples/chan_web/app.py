@@ -42,7 +42,7 @@ from fractal_levels import fractal_high_low  # noqa: E402
 from symbol_resolve import resolve_contract  # noqa: E402
 
 # 侧边栏显示：用于确认已拉取到含「合约别名」的最新脚本（改代码后请结束旧 Streamlit 再启）
-CHAN_WEB_BUILD = "057c5d1"
+CHAN_WEB_BUILD = "1.57-width-stretch"
 
 
 def _fig_candle(df: pd.DataFrame, title: str, *, show_fractal: bool, fractal_n: int) -> go.Figure:
@@ -220,13 +220,13 @@ def main() -> None:
         else:
             title = f"{code} {period} 共 {len(df)} 根"
             fig = _fig_candle(df, title, show_fractal=show_frac, fractal_n=int(frac_n))
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width="stretch")
 
     with tab_raw:
         if err or df is None or df.empty:
             st.caption("有有效数据后在此显示表格与导出。")
         else:
-            st.dataframe(df.tail(500), use_container_width=True)
+            st.dataframe(df.tail(500), width="stretch")
             buf = io.StringIO()
             df.to_csv(buf)
             st.download_button("下载当前表 CSV", buf.getvalue(), file_name="ohlcv_export.csv", mime="text/csv")
