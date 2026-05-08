@@ -4,8 +4,8 @@
 
 ## 步骤
 
-1. 克隆 [chan.py](https://github.com/Vespa314/chan.py)，使用 **Python 3.11+** 虚拟环境并安装其依赖。  
-2. 把本目录的 **`XtQuant.py`** 复制到 chan 仓库的 **`DataAPI/XtQuant.py`**（与 `BaoStockAPI.py` 同级）。  
+1. 克隆 [chan.py](https://github.com/Vespa314/chan.py)（或使用本仓库已准备的 **`examples/chan_web/vendor/chan/`**，见该目录下 `README.txt`），使用 **Python 3.11+** 虚拟环境并安装其依赖。  
+2. 若使用本仓库内的 **`examples/chan_web/vendor/chan/`**，其中 **`DataAPI/XtQuant.py`** 已从本目录自动同步过；若你另有独立 chan 克隆，请把本目录的 **`XtQuant.py`** 复制到其 **`DataAPI/XtQuant.py`**（与 `BaoStockAPI.py` 同级）。  
 3. 启动 **miniQMT / QMT**；可选设置环境变量 **`MINIQMT_USERDATA`** 指向 `userdata_mini`。  
 4. 在 chan 环境中 `import xtquant` 可用（通常与 VeighNa 同一 Python 或 QMT 自带解释器）。  
 5. 计算示例（单级别 5 分钟，代码为 QMT 格式；`CChan` 构造时会自动拉数据并完成计算）：

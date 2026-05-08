@@ -2,3 +2,8 @@
 streamlit>=1.28.0
 plotly>=5.18.0
 pandas>=2.0.0
+numpy>=1.24.0
+# 可选：合约索引写入 PostgreSQL（未装则仅用 JSON）
+psycopg[binary]>=3.1.0
+# 启动时加载 examples/.env（CHAN_WEB_PG_URI、PGPORT=5433 等）
+python-dotenv>=1.0.0

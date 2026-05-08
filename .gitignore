@@ -59,3 +59,9 @@ data/vnpy_yue/
 # CTA 回测脚本独立 Sqlite（run_dual_ma_cta_backtest.py）
 examples/quick_tests/cta_bt_workspace/
 
+# chan_web 本地 QMT 全市场合约索引（体积大）
+examples/chan_web/.cache/
+
+# chan.py 上游克隆（见 examples/chan_web/vendor/README.txt）
+examples/chan_web/vendor/chan/
+

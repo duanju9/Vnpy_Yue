@@ -20,13 +20,17 @@ miniQMT / xtquant → chan.py 的 K 线数据源。
 环境：已启动 QMT/miniQMT；可选环境变量 ``MINIQMT_USERDATA`` 指向 ``userdata_mini``；
 当前 Python 能 ``from xtquant import xtdata``。
 
+**chan_web**：在构造 ``CChan`` 前可调用 ``chan_web_set_kline_feed`` 注入已拉好的 ``DataFrame``，
+则 ``get_kl_data`` 不再请求 xtdata；结束后务必 ``chan_web_clear_kline_feed``。
+若需强制仍走 xtdata（调试），设置环境变量 ``CHAN_WEB_CHAN_OVERLAY_USE_QMT_REFETCH=1``。
+
 说明：``KL_TYPE.K_3M`` 在 xtdata 中无对应周期，本实现会直接抛错。
 """
 
 from __future__ import annotations
 
 import os
-from typing import Any, Iterable
+from typing import Any, Iterable, Iterator, Optional
 
 import pandas as pd
 
@@ -34,6 +38,77 @@ from Common.CEnum import AUTYPE, DATA_FIELD, KL_TYPE
 from Common.CTime import CTime
 from DataAPI.CommonStockAPI import CCommonStockApi
 from KLine.KLine_Unit import CKLine_Unit
+
+# chan_web：在跑 CChan 前注入当前页已拉好的 OHLCV，避免再走 xtdata 拉线（见 chan_plotly_overlay）。
+_chan_web_kline_feed: Optional[dict[str, Any]] = None
+
+
+def chan_web_set_kline_feed(
+    code: str,
+    k_type: KL_TYPE,
+    begin_date: str,
+    end_date: str,
+    df: pd.DataFrame,
+) -> None:
+    """由 examples/chan_web 在构造 ``CChan`` 前调用；必须在 ``finally`` 里配对 ``chan_web_clear_kline_feed``。"""
+    global _chan_web_kline_feed
+    _chan_web_kline_feed = {
+        "code": code,
+        "k_type": k_type,
+        "begin_date": begin_date,
+        "end_date": end_date,
+        "df": df,
+    }
+
+
+def chan_web_clear_kline_feed() -> None:
+    global _chan_web_kline_feed
+    _chan_web_kline_feed = None
+
+
+def _pd_ts_to_ctime(ts: Any) -> CTime:
+    t = pd.Timestamp(ts)
+    if t.tzinfo is not None:
+        t = t.tz_convert("Asia/Shanghai")
+    dt = t.to_pydatetime()
+    if dt.tzinfo is not None:
+        dt = dt.replace(tzinfo=None)
+    return CTime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
+
+
+def _ohlcv_df_to_klu_iter(df: pd.DataFrame) -> Iterator[CKLine_Unit]:
+    d = df.sort_index()
+    if not isinstance(d.index, pd.DatetimeIndex):
+        d = d.copy()
+        d.index = pd.to_datetime(d.index)
+    ohlc = ("open", "high", "low", "close")
+    if all(c in d.columns for c in ohlc):
+        d = d.dropna(subset=list(ohlc), how="any")
+    if d.empty:
+        return
+    has_vol = "volume" in d.columns
+    has_amt = "amount" in d.columns
+    idx = d.index
+    for i in range(len(d)):
+        ts = idx[i]
+        row = d.iloc[i]
+        ct = _pd_ts_to_ctime(ts)
+        o = float(row["open"])
+        h = float(row["high"])
+        lo = float(row["low"])
+        c = float(row["close"])
+        vol = float(row["volume"]) if has_vol and pd.notna(row["volume"]) else 0.0
+        amt = float(row["amount"]) if has_amt and pd.notna(row["amount"]) else 0.0
+        item = {
+            DATA_FIELD.FIELD_TIME: ct,
+            DATA_FIELD.FIELD_OPEN: o,
+            DATA_FIELD.FIELD_HIGH: h,
+            DATA_FIELD.FIELD_LOW: lo,
+            DATA_FIELD.FIELD_CLOSE: c,
+            DATA_FIELD.FIELD_VOLUME: vol,
+            DATA_FIELD.FIELD_TURNOVER: amt,
+        }
+        yield CKLine_Unit(item)
 
 
 def _import_xtdata() -> Any:
@@ -148,6 +223,16 @@ class CXtQuantStock(CCommonStockApi):
         super().__init__(code, k_type, begin_date, end_date, autype)
 
     def get_kl_data(self) -> Iterable[CKLine_Unit]:
+        feed = _chan_web_kline_feed
+        if (
+            feed is not None
+            and feed.get("code") == self.code
+            and feed.get("k_type") == self.k_type
+            and _norm_xt_range(self.begin_date, self.end_date)
+            == _norm_xt_range(feed.get("begin_date"), feed.get("end_date"))
+        ):
+            yield from _ohlcv_df_to_klu_iter(feed["df"])
+            return
         xt = CXtQuantStock._xtdata
         assert xt is not None
         period = _kl_to_period(self.k_type)
@@ -170,6 +255,17 @@ class CXtQuantStock(CCommonStockApi):
             yield CKLine_Unit(item)
 
     def SetBasciInfo(self):
+        feed = _chan_web_kline_feed
+        if (
+            feed is not None
+            and feed.get("code") == self.code
+            and feed.get("k_type") == self.k_type
+            and _norm_xt_range(self.begin_date, self.end_date)
+            == _norm_xt_range(feed.get("begin_date"), feed.get("end_date"))
+        ):
+            self.name = str(self.code)
+            self.is_stock = self.code.endswith(".SH") or self.code.endswith(".SZ")
+            return
         xt = CXtQuantStock._xtdata
         assert xt is not None
         try:
@@ -186,6 +282,9 @@ class CXtQuantStock(CCommonStockApi):
 
     @classmethod
     def do_init(cls):
+        if _chan_web_kline_feed is not None:
+            cls._xtdata = None
+            return
         xt = _import_xtdata()
         if hasattr(xt, "enable_hello"):
             xt.enable_hello = False
