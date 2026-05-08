@@ -38,6 +38,10 @@ powershell -ExecutionPolicy Bypass -File examples/chan_web/run.ps1
 
 若仍停在「Welcome / email」：在终端 **直接按一次 Enter**（邮箱留空）即可继续。
 
+## 合约输入
+
+支持 **QMT 标准代码**、**六位数字**、**中文简称/前缀**（如「天赐」→ 天赐材料）、**拼音缩写**（如 `tccl`→天赐材料、`gzmt`→贵州茅台）。可扩展列表见 `examples/chan_web/symbol_resolve.py` 中 `_PINYIN_ABBREV` 与 `qmt_5m_vol_pullback_macd_backtest._KNOWN_STOCK_NAMES`。
+
 ## 给同一 WiFi 下的朋友访问
 
 ```text

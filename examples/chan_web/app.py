@@ -39,6 +39,7 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT / "examples" / "chan_web"))
 
 from fractal_levels import fractal_high_low  # noqa: E402
+from symbol_resolve import resolve_contract  # noqa: E402
 
 
 def _fig_candle(df: pd.DataFrame, title: str, *, show_fractal: bool, fractal_n: int) -> go.Figure:
@@ -133,7 +134,11 @@ def main() -> None:
     with st.sidebar:
         st.header("数据")
         src = st.radio("来源", ("miniQMT (xtdata)", "上传 CSV"), index=0)
-        code = st.text_input("合约代码", value="600519.SH", help="QMT 格式，如 600519.SH")
+        code_raw = st.text_input(
+            "合约（代码 / 六位 / 中文简称 / 拼音缩写）",
+            value="600519.SH",
+            help="例: 600519.SH、002709、天赐、tccl（天赐材料）、gzmt（贵州茅台）",
+        )
         period = st.selectbox("周期", ("5m", "1d"), index=0)
         count = st.number_input("K 线根数 (QMT)", min_value=50, max_value=50000, value=2000, step=100)
         download = st.checkbox("download_history_data 增量", value=True)
@@ -145,20 +150,32 @@ def main() -> None:
 
     df: pd.DataFrame | None = None
     err: str | None = None
+    code = (code_raw or "").strip()
 
     if src.startswith("miniQMT"):
         try:
-            from data_qmt import fetch_ohlcv
-
-            with st.spinner("连接 QMT 并拉取行情…"):
-                df = fetch_ohlcv(code, period, int(count), download=download)
-        except Exception as e:
+            code, cname = resolve_contract(code_raw)
+            if cname:
+                st.sidebar.success(f"已识别：**{code}**（{cname}）")
+            else:
+                st.sidebar.success(f"已识别：**{code}**")
+        except ValueError as e:
             err = str(e)
+            code = ""
+        if not err:
+            try:
+                from data_qmt import fetch_ohlcv
+
+                with st.spinner("连接 QMT 并拉取行情…"):
+                    df = fetch_ohlcv(code, period, int(count), download=download)
+            except Exception as e:
+                err = str(e)
     elif up is not None:
         try:
             from data_qmt import load_csv
 
             df = load_csv(up)
+            code = up.name or "CSV"
         except Exception as e:
             err = str(e)
 
