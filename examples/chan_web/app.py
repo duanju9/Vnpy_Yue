@@ -42,7 +42,7 @@ from fractal_levels import fractal_high_low  # noqa: E402
 from symbol_resolve import resolve_contract  # noqa: E402
 
 # 侧边栏显示：用于确认已拉取到含「合约别名」的最新脚本（改代码后请结束旧 Streamlit 再启）
-CHAN_WEB_BUILD = "28965df+ux"
+CHAN_WEB_BUILD = "057c5d1"
 
 
 def _fig_candle(df: pd.DataFrame, title: str, *, show_fractal: bool, fractal_n: int) -> go.Figure:
