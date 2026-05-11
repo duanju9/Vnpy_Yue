@@ -2,7 +2,8 @@
 # Run: powershell -NoProfile -ExecutionPolicy Bypass -File run_sector_sync_full_auto.ps1
 
 $ErrorActionPreference = 'Stop'
-$Root = 'D:\Vnpy\Vnpy_Yue'
+# 本脚本位于 examples/miniqmt_research/data/，向上三级为仓库根
+$Root = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 $MaxWaitHours = 6
 
 Set-Location -LiteralPath $Root
@@ -13,7 +14,11 @@ $db  = Join-Path $Root 'examples\miniqmt_research\data\miniqmt.sqlite'
 
 # 显式指向研究库 SQLite，避免与其它环境混淆（路径含空格由 Join-Path / LiteralPath 处理）
 $env:MINIQMT_SQLITE_PATH = $db
-$env:MINIQMT_USERDATA = 'D:\Program Files (x86)\QMT\迅投极速策略交易系统交易终端 华鑫证券QMT实盘\userdata_mini'
+# userdata 含本机路径，勿写死在仓库；运行前请在会话或系统中设置 MINIQMT_USERDATA
+if ([string]::IsNullOrWhiteSpace($env:MINIQMT_USERDATA)) {
+    Write-Host "请先设置环境变量 MINIQMT_USERDATA 为 miniQMT 的 userdata_mini 路径，再运行本脚本。" -ForegroundColor Red
+    exit 2
+}
 if ($env:MINIQMT_PG_URI) { Remove-Item Env:\MINIQMT_PG_URI -ErrorAction SilentlyContinue }
 
 function Clear-LogFiles {

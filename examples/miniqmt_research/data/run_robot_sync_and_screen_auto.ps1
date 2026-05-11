@@ -2,7 +2,7 @@
 # Run: powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "...\run_robot_sync_and_screen_auto.ps1"
 
 $ErrorActionPreference = 'Stop'
-$Root = 'D:\Vnpy\Vnpy_Yue'
+$Root = (Resolve-Path (Join-Path $PSScriptRoot '..\..\..')).Path
 Set-Location -LiteralPath $Root
 
 $sectorScript = Join-Path $PSScriptRoot 'run_sector_sync_full_auto.ps1'

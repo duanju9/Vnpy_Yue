@@ -93,14 +93,14 @@
 
 ### 4.6 自动化流水线（PowerShell）
 
-- `examples/miniqmt_research/data/run_sector_sync_full_auto.ps1`：全量板块落库 + 日志监控 + SQLite 行数校验（**脚本内勿提交**本机 `userdata` 路径；请各开发者本地改为自己路径或使用环境变量）。  
+- `examples/miniqmt_research/data/run_sector_sync_full_auto.ps1`：全量板块落库 + 日志监控 + SQLite 行数校验（**不在脚本内写死** `MINIQMT_USERDATA`；运行前必须在环境中设置）。  
 - `examples/miniqmt_research/data/run_robot_sync_and_screen_auto.ps1`：串联板块同步 + 机器人 union 评分 + `picks_report`；输出在 `daily_picks/` 下按日期命名，并维护 `latest_*` 副本名（见脚本内注释）。
 
 ---
 
 ## 5. 第三方学习资料（MIT）
 
-- 路径：`docs/reference/mattpocock-skills/`（浅克隆，MIT License）  
+- 路径：`docs/reference/mattpocock-skills/`（上游 [mattpocock/skills](https://github.com/mattpocock/skills)，MIT License；**已去掉嵌套 `.git`**，作为普通目录纳入本仓库，避免 submodule 空壳。）  
 - 索引：`docs/reference/README_mattpocock_skills_学习指引.txt`  
 - 与 Cursor Skills 格式理念相近，**非**运行时代码依赖。
 
