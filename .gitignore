@@ -65,3 +65,19 @@ examples/chan_web/.cache/
 # chan.py 上游克隆（见 examples/chan_web/vendor/README.txt）
 examples/chan_web/vendor/chan/
 
+# miniqmt 研究库本地 SQLite（体积大；保留 data/README.txt）
+examples/miniqmt_research/data/*.sqlite
+examples/miniqmt_research/data/*.sqlite-*
+
+# 涨停因子挖掘输出（体积大）
+examples/miniqmt_research/output/
+
+# 涨停研究跑批归档（含大 CSV）
+examples/miniqmt_research/runs/
+
+# 本机 miniQMT 环境（含真实账号，勿提交）
+examples/miniqmt_live/set_miniqmt_env_local.cmd
+
+# 每日概念评分输出（可复跑；避免误交大 CSV / Excel 打开中的文件）
+examples/miniqmt_research/daily_picks/*.csv
+
